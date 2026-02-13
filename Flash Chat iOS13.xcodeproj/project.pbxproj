@@ -20,6 +20,7 @@
 		D5CDEBE12F3CE04200CC8D14 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = D5CDEBE02F3CE04200CC8D14 /* GoogleService-Info.plist */; };
 		D5CDEBE42F3CE17F00CC8D14 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = D5CDEBE32F3CE17F00CC8D14 /* FirebaseAuth */; };
 		D5CDEBE62F3CE17F00CC8D14 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = D5CDEBE52F3CE17F00CC8D14 /* FirebaseFirestore */; };
+		D5CDEBEA2F3F91BF00CC8D14 /* Constents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5CDEBE92F3F91B400CC8D14 /* Constents.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		0B628190235DF01B00E35CAF /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		0B62819D235F0F4D00E35CAF /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		D5CDEBE02F3CE04200CC8D14 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		D5CDEBE92F3F91B400CC8D14 /* Constents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constents.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +78,7 @@
 				0B628194235DF03A00E35CAF /* Models */,
 				0B628193235DF03400E35CAF /* Views */,
 				0B628192235DF02000E35CAF /* Controllers */,
+				D5CDEBE92F3F91B400CC8D14 /* Constents.swift */,
 				0B62817F235DEE8400E35CAF /* Assets.xcassets */,
 				0B628181235DEE8400E35CAF /* LaunchScreen.storyboard */,
 				0B628184235DEE8400E35CAF /* Info.plist */,
@@ -188,6 +191,7 @@
 			files = (
 				0B62818B235DF00000E35CAF /* WelcomeViewController.swift in Sources */,
 				0B628177235DEE8100E35CAF /* AppDelegate.swift in Sources */,
+				D5CDEBEA2F3F91BF00CC8D14 /* Constents.swift in Sources */,
 				0B628179235DEE8100E35CAF /* SceneDelegate.swift in Sources */,
 				0B62818F235DF01000E35CAF /* LoginViewController.swift in Sources */,
 				0B628191235DF01B00E35CAF /* ChatViewController.swift in Sources */,
