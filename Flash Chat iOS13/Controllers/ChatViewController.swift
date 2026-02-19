@@ -17,11 +17,7 @@ class ChatViewController: UIViewController {
     
     let db = Firestore.firestore()
   
-    var messages: [Messages] = [
-        Messages(sender: "mvt@ok.com", message: "hey!"),
-        Messages(sender: "lokkit@ok.com", message: "hello! how are you?"),
-        Messages(sender: "mvt@ok.com", message: "doing wwell, Thanks. a very very very very big message here. let's see how long a message goes and how it will be displayed in the app!!!")
-    ]
+    var messages: [Messages] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +28,30 @@ class ChatViewController: UIViewController {
         
         tableView.register(UINib(nibName: K.cellNibName, bundle: nil), forCellReuseIdentifier: K.cellIdentifier)
         
+        loadMessages()
+        
+    }
+    private func loadMessages() {
+        Task{
+            messages = []
+            do {
+                let snapshot = try await db.collection(K.FStore.collectionName).getDocuments()
+                for document in snapshot.documents{
+                    print(document.data())
+                    let item = document.data()
+                    if let sender = item[K.FStore.senderField] as? String,  let msg = item[K.FStore.bodyField] as? String{
+                        messages.append(Messages(sender: sender, message: msg))
+                    }
+                    else{
+                        print("I seee= some error here")
+                    }
+                    print(messages)
+                    await MainActor.run {
+                        self.tableView.reloadData()
+                    }
+                }
+            }
+        }
     }
     
     @IBAction func logOutPressed(_ sender: Any) {
@@ -48,7 +68,7 @@ class ChatViewController: UIViewController {
     @IBAction func sendPressed(_ sender: UIButton) {
         Task{
             
-            guard let messageBody = messageTextfield.text else{
+            guard let messageBody = messageTextfield.text, !messageBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else{
                 print("no message typed")
                 return
             }
@@ -63,11 +83,18 @@ class ChatViewController: UIViewController {
                     K.FStore.bodyField: messageBody
                 ])
                 print("Document added with ID: \(ref.documentID)")
+                await MainActor.run{
+                    self.loadMessages()
+                    self.messageTextfield.text = ""
+                }
             } catch{
                 print("Error adding document: \(error)")
             }
         }
+        
+
     }
+    
     
     
 
