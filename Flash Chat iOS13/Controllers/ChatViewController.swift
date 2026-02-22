@@ -32,26 +32,30 @@ class ChatViewController: UIViewController {
         
     }
     private func loadMessages() {
-        Task{
-            messages = []
-            do {
-                let snapshot = try await db.collection(K.FStore.collectionName).getDocuments()
-                for document in snapshot.documents{
-                    print(document.data())
-                    let item = document.data()
-                    if let sender = item[K.FStore.senderField] as? String,  let msg = item[K.FStore.bodyField] as? String{
-                        messages.append(Messages(sender: sender, message: msg))
-                    }
-                    else{
-                        print("I seee= some error here")
-                    }
-                    print(messages)
-                    await MainActor.run {
-                        self.tableView.reloadData()
-                    }
+        let listener = db.collection(K.FStore.collectionName)
+            .order(by: K.FStore.dateField)
+            .addSnapshotListener(){ snapshot, error in
+            if let error = error{
+                print("some error while listening")
+                return
+            }
+            guard let snapshotDocs = snapshot?.documents else {return }
+            self.messages = []
+            for document in snapshotDocs{
+                let item = document.data()
+                if let sender = item[K.FStore.senderField] as? String,  let msg = item[K.FStore.bodyField] as? String{
+                    self.messages.append(Messages(sender: sender, message: msg))
+                }
+                else{
+                    print("I see some error here")
                 }
             }
+            print(self.messages)
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
+        
     }
     
     @IBAction func logOutPressed(_ sender: Any) {
@@ -80,11 +84,12 @@ class ChatViewController: UIViewController {
             do {
                 let ref = try await db.collection(K.FStore.collectionName).addDocument(data: [
                     K.FStore.senderField: messageSender,
-                    K.FStore.bodyField: messageBody
+                    K.FStore.bodyField: messageBody,
+                    K.FStore.dateField: Date().timeIntervalSince1970
                 ])
                 print("Document added with ID: \(ref.documentID)")
                 await MainActor.run{
-                    self.loadMessages()
+//                    self.loadMessages()
                     self.messageTextfield.text = ""
                 }
             } catch{
