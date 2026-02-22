@@ -29,7 +29,6 @@ class ChatViewController: UIViewController {
         
         //Table
         tableView.dataSource = self
-        title = K.appTitle
         navigationItem.hidesBackButton = true
         tableView.register(UINib(nibName: K.cellNibName, bundle: nil), forCellReuseIdentifier: K.cellIdentifier)
         
@@ -54,7 +53,7 @@ class ChatViewController: UIViewController {
             for document in snapshotDocs{
                 let item = document.data()
                 if let sender = item[K.FStore.senderField] as? String,  let msg = item[K.FStore.bodyField] as? String{
-                    self.messages.append(Messages(sender: sender, message: msg))
+                    self.messages.append(Messages(sender: sender, body: msg))
                 }
                 else{
                     print("I see some error here")
@@ -63,6 +62,11 @@ class ChatViewController: UIViewController {
 //            print("All the messages: \(self.messages)")
             Task { @MainActor in
                 self.tableView.reloadData()
+                if self.messages.count - 1 >= 0{
+                    let indexPath = IndexPath(row: self.messages.count - 1, section: 0)
+                    self.tableView.scrollToRow(at: indexPath, at: .top, animated: true)
+                }
+                
             }
         }
         
@@ -99,7 +103,6 @@ class ChatViewController: UIViewController {
                 ])
                 print("Document added with ID: \(ref.documentID)")
                 await MainActor.run{
-//                    self.loadMessages()
                     self.messageTextfield.text = ""
                 }
             } catch{
@@ -123,9 +126,26 @@ extension ChatViewController : UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let message  = messages[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: K.cellIdentifier, for: indexPath) as! MessageCell
+        cell.messageLabel?.text = message.body
         
-        cell.messageLabel?.text = messages[indexPath.row].message
+        //this is a message feom the current user
+        if message.sender == Auth.auth().currentUser?.email{
+            cell.leftImageView?.isHidden = true
+            cell.rightImageView?.isHidden = false
+            cell.messageBubble.backgroundColor = UIColor(named: K.BrandColors.lightPurple)
+            cell.messageLabel.textColor = UIColor(named: K.BrandColors.purple)
+        }
+        
+        // This message from another sender
+        else{
+            cell.leftImageView?.isHidden = false
+            cell.rightImageView?.isHidden = true
+            cell.messageBubble.backgroundColor = UIColor(named: K.BrandColors.purple)
+            cell.messageLabel.textColor = UIColor(named: K.BrandColors.lightPurple)
+        }
+       
         return cell
     }
     
