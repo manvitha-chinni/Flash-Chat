@@ -18,27 +18,37 @@ class ChatViewController: UIViewController {
     let db = Firestore.firestore()
   
     var messages: [Messages] = []
+    
+    private var listener: ListenerRegistration?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //keyborad
+
+        
+        //Table
         tableView.dataSource = self
         title = K.appTitle
         navigationItem.hidesBackButton = true
-        
         tableView.register(UINib(nibName: K.cellNibName, bundle: nil), forCellReuseIdentifier: K.cellIdentifier)
+        
         
         loadMessages()
         
     }
     private func loadMessages() {
-        let listener = db.collection(K.FStore.collectionName)
+        listener = db.collection(K.FStore.collectionName)
             .order(by: K.FStore.dateField)
-            .addSnapshotListener(){ snapshot, error in
+            .addSnapshotListener(){ [weak self] snapshot, error in
+                
+            guard let self = self else { return }
+                
             if let error = error{
-                print("some error while listening")
+                print("Firestore listener error: \(error)")
                 return
             }
+                
             guard let snapshotDocs = snapshot?.documents else {return }
             self.messages = []
             for document in snapshotDocs{
@@ -50,8 +60,8 @@ class ChatViewController: UIViewController {
                     print("I see some error here")
                 }
             }
-            print(self.messages)
-            DispatchQueue.main.async {
+//            print("All the messages: \(self.messages)")
+            Task { @MainActor in
                 self.tableView.reloadData()
             }
         }
@@ -101,7 +111,9 @@ class ChatViewController: UIViewController {
     }
     
     
-    
+    deinit {
+        listener?.remove()
+    }
 
 }
 
@@ -116,6 +128,7 @@ extension ChatViewController : UITableViewDataSource{
         cell.messageLabel?.text = messages[indexPath.row].message
         return cell
     }
+    
     
 }
 
